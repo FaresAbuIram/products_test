@@ -1,0 +1,142 @@
+definitions:
+  models.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.Product:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+    required:
+    - category
+    - id
+    - name
+    - price
+    - quantity
+    type: object
+  models.ProductData:
+    properties:
+      category:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /product:
+    post:
+      description: This route uses to add new product to Products map
+      parameters:
+      - description: new data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      summary: add new product
+      tags:
+      - Products
+  /product/{id}:
+    delete:
+      description: This route uses to delete an existing product from Products map
+      parameters:
+      - description: product id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      summary: delete a product
+      tags:
+      - Products
+    put:
+      description: This route uses to update an existing product in Products map
+      parameters:
+      - description: product id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: updated data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProductData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      summary: update a product
+      tags:
+      - Products
+  /products:
+    get:
+      description: This route uses to get all products from the Products map
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/models.ProductData'
+            type: object
+      summary: get all products
+      tags:
+      - Products
+swagger: "2.0"
