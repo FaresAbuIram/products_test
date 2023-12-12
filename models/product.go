@@ -25,3 +25,14 @@ type UpdateProductData struct {
 type MessageResponse struct {
 	Message string `bson:"message"`
 }
+
+type SearchByCategoryAndPriceRangeModel struct {
+	Category *string  `bson:"category"`
+	MinPrice *float64 `bson:"minPrice"`
+	MaxPrice *float64 `bson:"maxPrice"`
+}
+
+type AveragePriceAndTotalQuantity struct {
+	AveragePrice  float64
+	TotalQuantity int
+}

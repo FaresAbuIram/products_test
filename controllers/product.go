@@ -54,7 +54,7 @@ func NewProductController(productServiceType service.ProductServiceType) *Produc
 func (p *ProductController) GetAllProduct(context *gin.Context) {
 	p.Logger.InfoLogger.Println("controllers,", "product.go,", "GetAllProduct() Func")
 
-	result := p.ProductService.GetAllProduct(context)
+	result := p.ProductService.GetAllProduct()
 
 	context.JSON(http.StatusOK, gin.H{"data": result})
 }
@@ -67,7 +67,7 @@ func (p *ProductController) GetAllProduct(context *gin.Context) {
 // @Success      200  {object} models.MessageResponse
 // @Failure      400  {object}	models.MessageResponse
 // @Failure      500  {object}	models.MessageResponse
-// @Tags Products
+// @Tags Product Modification
 // @Router       /product [post]
 func (p *ProductController) AddProduct(context *gin.Context) {
 	p.Logger.InfoLogger.Println("controllers,", "product.go,", "AddProduct() Func")
@@ -81,7 +81,7 @@ func (p *ProductController) AddProduct(context *gin.Context) {
 	}
 
 	// save the resource in the Product map
-	err := p.ProductService.InsertNewProduct(context, productData)
+	err := p.ProductService.InsertNewProduct(productData)
 
 	if err != nil {
 		p.Logger.ErrorLogger.Println("Failed to store the product: ", err)
@@ -101,7 +101,7 @@ func (p *ProductController) AddProduct(context *gin.Context) {
 // @Success      200  {object} models.MessageResponse
 // @Failure      400  {object}	models.MessageResponse
 // @Failure      500  {object}	models.MessageResponse
-// @Tags Products
+// @Tags Product Modification
 // @Router       /product/{id} [put]
 func (p *ProductController) UpdateProduct(context *gin.Context) {
 	p.Logger.InfoLogger.Println("controllers,", "product.go,", "UpdateProduct() Func")
@@ -131,7 +131,7 @@ func (p *ProductController) UpdateProduct(context *gin.Context) {
 	}
 
 	// save the resource in the Product map
-	err = p.ProductService.UpdateProduct(context, productId, productData)
+	err = p.ProductService.UpdateProduct(productId, productData)
 
 	if err != nil {
 		p.Logger.ErrorLogger.Println("Failed to update the product: ", err)
@@ -150,7 +150,7 @@ func (p *ProductController) UpdateProduct(context *gin.Context) {
 // @Success      200  {object} models.MessageResponse
 // @Failure      400  {object}	models.MessageResponse
 // @Failure      500  {object}	models.MessageResponse
-// @Tags Products
+// @Tags Product Modification
 // @Router       /product/{id} [delete]
 func (p *ProductController) DeleteProduct(context *gin.Context) {
 	p.Logger.InfoLogger.Println("controllers,", "product.go,", "DeleteProduct() Func")
@@ -172,7 +172,7 @@ func (p *ProductController) DeleteProduct(context *gin.Context) {
 	}
 
 	// save the resource in the Product map
-	err = p.ProductService.DeleteProduct(context, productId)
+	err = p.ProductService.DeleteProduct(productId)
 
 	if err != nil {
 		p.Logger.ErrorLogger.Println("Failed to delete the product: ", err)
@@ -181,4 +181,88 @@ func (p *ProductController) DeleteProduct(context *gin.Context) {
 	}
 
 	SuccessResponseStatus(context, http.StatusOK, "successfully deleted the product")
+}
+
+// SearchByCategoryAndPriceRange Function used to to search for products by category and/or price range.
+// @Summary      search for products by category and/or price range
+// @Description  This route uses to search for products by category and/or price range from Products map
+// @Produce      json
+// @Param        query  query models.SearchByCategoryAndPriceRangeModel true "search query"
+// @Success      200  {object}  map[int]models.ProductData
+// @Failure      400  {object}	models.MessageResponse
+// @Failure      500  {object}	models.MessageResponse
+// @Tags Product Functionality
+// @Router       /seach-by-categry-and-price-range [get]
+func (p *ProductController) SearchByCategoryAndPriceRange(context *gin.Context) {
+	p.Logger.InfoLogger.Println("controllers,", "product.go,", "SearchByCategoryAndPriceRange() Func")
+
+	var query models.SearchByCategoryAndPriceRangeModel
+	category := context.Request.URL.Query().Get("category")
+	minPrice := context.Request.URL.Query().Get("minPrice")
+	maxPrice := context.Request.URL.Query().Get("maxPrice")
+
+	if category != "" {
+		query.Category = &category
+	}
+
+	if minPrice != "" {
+		minPriceFloat, err := strconv.ParseFloat(minPrice, 64)
+		if err != nil {
+			p.Logger.ErrorLogger.Println("min price is not a number")
+			ErrorResponseStatus(context, http.StatusBadRequest, "min price is not a numer")
+			return
+		}
+		query.MinPrice = &minPriceFloat
+	}
+
+	if maxPrice != "" {
+		maxPriceFloat, err := strconv.ParseFloat(maxPrice, 64)
+		if err != nil {
+			p.Logger.ErrorLogger.Println("max price is not a number")
+			ErrorResponseStatus(context, http.StatusBadRequest, "max price is not a number")
+			return
+		}
+		query.MaxPrice = &maxPriceFloat
+	}
+
+	result := p.ProductService.SearchByCategoryAndPriceRange(query)
+
+	context.JSON(http.StatusOK, gin.H{"data": result})
+}
+
+// GetAvgPriceAndTotalQuantityByCategory Function used to get average price and total quantity of all products in a category
+// @Summary      get average price and total quantity of all products in a category
+// @Description  This route uses to get average price and total quantity of all products in a category
+// @Produce      json
+// @Param        category  query string true "category name"
+// @Success      200  {object} models.AveragePriceAndTotalQuantity
+// @Failure      400  {object}	models.MessageResponse
+// @Failure      500  {object}	models.MessageResponse
+// @Tags Data Aggregation
+// @Router       /get-average-price-and-total-quantity-by-category [get]
+func (p *ProductController) GetAvgPriceAndTotalQuantityByCategory(context *gin.Context) {
+	p.Logger.InfoLogger.Println("controllers,", "product.go,", "GetAvgPriceAndTotalQuantityByCategory() Func")
+
+	category := context.Request.URL.Query().Get("category")
+
+	if category == "" {
+		p.Logger.ErrorLogger.Println("category is a required field")
+		ErrorResponseStatus(context, http.StatusBadRequest, "category is a required field")
+		return
+	}
+
+	avgPrice, totalQuantity, err := p.ProductService.GetAvgPriceAndTotalQuantityByCategory(category)
+
+	if err != nil {
+		p.Logger.ErrorLogger.Println(err)
+		ErrorResponseStatus(context, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	result := models.AveragePriceAndTotalQuantity{
+		AveragePrice:  avgPrice,
+		TotalQuantity: totalQuantity,
+	}
+
+	context.JSON(http.StatusOK, gin.H{"data": result})
 }

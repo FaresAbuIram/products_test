@@ -15,6 +15,47 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/get-average-price-and-total-quantity-by-category": {
+            "get": {
+                "description": "This route uses to get average price and total quantity of all products in a category",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Data Aggregation"
+                ],
+                "summary": "get average price and total quantity of all products in a category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "category name",
+                        "name": "category",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.AveragePriceAndTotalQuantity"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/product": {
             "post": {
                 "description": "This route uses to add new product to Products map",
@@ -22,7 +63,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Products"
+                    "Product Modification"
                 ],
                 "summary": "add new product",
                 "parameters": [
@@ -65,7 +106,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Products"
+                    "Product Modification"
                 ],
                 "summary": "update a product",
                 "parameters": [
@@ -113,7 +154,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Products"
+                    "Product Modification"
                 ],
                 "summary": "delete a product",
                 "parameters": [
@@ -169,9 +210,72 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/seach-by-categry-and-price-range": {
+            "get": {
+                "description": "This route uses to search for products by category and/or price range from Products map",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Product Functionality"
+                ],
+                "summary": "search for products by category and/or price range",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "maxPrice",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "name": "minPrice",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/models.ProductData"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.MessageResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "models.AveragePriceAndTotalQuantity": {
+            "type": "object",
+            "properties": {
+                "averagePrice": {
+                    "type": "number"
+                },
+                "totalQuantity": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.MessageResponse": {
             "type": "object",
             "properties": {

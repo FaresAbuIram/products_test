@@ -24,9 +24,15 @@ func Setup(router *gin.Engine) {
 	router.Use(static.Serve("/", static.LocalFile("./website/dist", true)))
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// Product Modification
 	router.GET("/products", productController.GetAllProduct)
 	router.POST("/product", productController.AddProduct)
 	router.PUT("/product/:id", productController.UpdateProduct)
 	router.DELETE("/product/:id", productController.DeleteProduct)
 
+	// Product Functionality
+	router.GET("/seach-by-categry-and-price-range", productController.SearchByCategoryAndPriceRange)
+
+	// Data Aggregation
+	router.GET("/get-average-price-and-total-quantity-by-category", productController.GetAvgPriceAndTotalQuantityByCategory)
 }

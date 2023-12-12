@@ -9,6 +9,7 @@ import (
 
 var (
 	Products    map[int]models.ProductData
+	Categories  map[string][]int
 	ErrorLogger *log.Logger
 	InfoLogger  *log.Logger
 	DebugLogger *log.Logger
@@ -30,6 +31,8 @@ func Connect() {
 
 	var products []models.Product
 	Products = make(map[int]models.ProductData)
+	Categories = make(map[string][]int)
+
 	// Unmarshal JSON data into the slice
 	if err := json.Unmarshal(data, &products); err != nil {
 		log.Fatal(err)
@@ -43,6 +46,8 @@ func Connect() {
 			Price:    item.Price,
 			Quantity: item.Quantity,
 		}
+
+		Categories[item.Category] = append(Categories[item.Category], item.ID)
 	}
 
 	InfoLogger.Println("successfully finished fetching the data from the JSON file")

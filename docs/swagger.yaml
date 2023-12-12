@@ -1,4 +1,11 @@
 definitions:
+  models.AveragePriceAndTotalQuantity:
+    properties:
+      averagePrice:
+        type: number
+      totalQuantity:
+        type: integer
+    type: object
   models.MessageResponse:
     properties:
       message:
@@ -37,6 +44,34 @@ definitions:
 info:
   contact: {}
 paths:
+  /get-average-price-and-total-quantity-by-category:
+    get:
+      description: This route uses to get average price and total quantity of all
+        products in a category
+      parameters:
+      - description: category name
+        in: query
+        name: category
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AveragePriceAndTotalQuantity'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      summary: get average price and total quantity of all products in a category
+      tags:
+      - Data Aggregation
   /product:
     post:
       description: This route uses to add new product to Products map
@@ -64,7 +99,7 @@ paths:
             $ref: '#/definitions/models.MessageResponse'
       summary: add new product
       tags:
-      - Products
+      - Product Modification
   /product/{id}:
     delete:
       description: This route uses to delete an existing product from Products map
@@ -91,7 +126,7 @@ paths:
             $ref: '#/definitions/models.MessageResponse'
       summary: delete a product
       tags:
-      - Products
+      - Product Modification
     put:
       description: This route uses to update an existing product in Products map
       parameters:
@@ -123,7 +158,7 @@ paths:
             $ref: '#/definitions/models.MessageResponse'
       summary: update a product
       tags:
-      - Products
+      - Product Modification
   /products:
     get:
       description: This route uses to get all products from the Products map
@@ -139,4 +174,38 @@ paths:
       summary: get all products
       tags:
       - Products
+  /seach-by-categry-and-price-range:
+    get:
+      description: This route uses to search for products by category and/or price
+        range from Products map
+      parameters:
+      - in: query
+        name: category
+        type: string
+      - in: query
+        name: maxPrice
+        type: number
+      - in: query
+        name: minPrice
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/models.ProductData'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.MessageResponse'
+      summary: search for products by category and/or price range
+      tags:
+      - Product Functionality
 swagger: "2.0"
