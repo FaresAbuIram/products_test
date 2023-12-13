@@ -34,7 +34,12 @@ The API seamlessly integrates Swagger for comprehensive API documentation and vi
 
 - **Run the Application:** After downloading the libraries, execute the following command:
     ```
-    go run main.go
+    make run
     ```
 
 - **Access Swagger Documentation:** Once the application is running, open your browser and go to http://localhost:8080/swagger/index.html to access the Swagger API documentation.
+
+- **Run Tests:** To run the tests, execute the following command:
+    ```
+    make tests
+    ```
